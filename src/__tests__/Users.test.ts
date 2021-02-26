@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import request from 'supertest';
+import { getConnection } from 'typeorm';
 
 import { app } from '../app';
 import createConnection from '../database';
@@ -7,13 +8,20 @@ import createConnection from '../database';
 const random = () => crypto.randomBytes(15).toString('hex');
 
 const name = random();
-const email = random();
+const email = random() + '@email.com';
 
 describe('Users', () => {
   beforeAll(async () => {
     const connection = await createConnection();
 
     await connection.runMigrations();
+  });
+
+  afterAll(async () => {
+    const connection = getConnection();
+
+    await connection.dropDatabase();
+    await connection.close();
   });
 
   it('Shoud be able to create a new user', async () => {

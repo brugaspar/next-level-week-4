@@ -1,27 +1,23 @@
 import { Request, Response } from 'express';
 import { getCustomRepository } from 'typeorm';
+
 import { SurveysRepository } from '../repositories/SurveysRepository';
 
+import { AppError } from '../errors/AppError';
 class SurveysController {
   async create(request: Request, response: Response) {
     const { title, description } = request.body;
 
-    try {
-      const surveysRepository = getCustomRepository(SurveysRepository);
+    const surveysRepository = getCustomRepository(SurveysRepository);
 
-      const survey = surveysRepository.create({
-        title,
-        description
-      });
+    const survey = surveysRepository.create({
+      title,
+      description
+    });
 
-      await surveysRepository.save(survey);
+    await surveysRepository.save(survey);
 
-      return response.status(201).json(survey);
-    } catch (err) {
-      return response.status(500).json({
-        error: 'Error when trying to save survey'
-      });
-    }
+    return response.status(201).json(survey);
   }
 
   async show(request: Request, response: Response) {
@@ -32,9 +28,7 @@ class SurveysController {
 
       return response.status(200).json(all);
     } catch (err) {
-      return response.status(500).json({
-        error: 'Error when trying to get surveys'
-      });
+      throw new AppError('Error when trying to get surveys', 500);
     }
   }
 }
